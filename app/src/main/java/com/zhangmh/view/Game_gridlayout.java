@@ -30,6 +30,9 @@ public class Game_gridlayout extends GridLayout {
     private List<Point> list;
     private Home mHome;//用来获取application
     private Myapplication application;
+
+
+
     //接下来，我们要修改currentScore了
     private int current_Score;
     private int widthPixels;
@@ -37,6 +40,7 @@ public class Game_gridlayout extends GridLayout {
     boolean can_revert;
     private int[][] last_time_State;
     private int last_time_Score;
+    private List<Point> clonelist;
 
 
     public int getRowcount() {
@@ -81,6 +85,8 @@ public class Game_gridlayout extends GridLayout {
         columncount=application.getLine_Num();
         numberItemsList=new NumberItem[rowcount][columncount];
         list=new ArrayList<>();
+        last_time_Score=0;
+        current_Score=0;
         //getWindowManager()是activity的方法，这里要获取屏幕的尺寸不能用它
         WindowManager mWindowManager = (WindowManager) getContext().getSystemService(getContext().WINDOW_SERVICE);
         Display defaultDisplay = mWindowManager.getDefaultDisplay();
@@ -105,7 +111,7 @@ public class Game_gridlayout extends GridLayout {
     public void addNum(){
 
         updateList();
-        Log.v("HW2", "---" +list.size());
+       // Log.v("HW2", "---" +list.size());
         int size = list.size();
         if(size>0){
             int positon= (int) Math.floor(Math.random()*size);
@@ -145,6 +151,7 @@ public class Game_gridlayout extends GridLayout {
                 endY=event.getY();
                 //防止过短触碰触发事件
                 if((Math.abs(endX-startX)>widthPixels/5)||(Math.abs(endY-startY)> widthPixels / 5)) {
+
                     judgeDirect(startX, endX, startY, endY);
                     mHome.getTv_home_currentScore().setText(current_Score + "");
                     handleResult(getGameStateCode());
@@ -438,6 +445,8 @@ public class Game_gridlayout extends GridLayout {
                         })
                         .show();
                 break;
+            case 4:
+                break;
         }
     }
     //重置游戏
@@ -449,6 +458,8 @@ public class Game_gridlayout extends GridLayout {
         mHome.getTv_home_tagScore().setText(application.getTag_Score()+"");
     }
     //获取游戏状态，1 游戏可以继续进行 2 游戏结束,游戏结束的时候保存分数 3 目标达成，游戏成功，保存分数
+    //游戏可以继续进行分两种，一种是可以继续产生随机的textview，一种是不可以，因为当游戏模块两次移动的状态位置都没有发生改变的时候
+    //即便还可以再玩，也不会产生随机数,我们把这部分放在移动判断的方法中，设置一个flag
     public int getGameStateCode(){
         int tag_score = application.getTag_Score();
         //判断是否有某个模块达到目标分数
@@ -479,14 +490,31 @@ public class Game_gridlayout extends GridLayout {
                 }
             }
             //若不存在可以相加的模块，则游戏结束
-            if(current_Score>=tag_score){
+            if(current_Score>=application.getRecord_Score()){
                 application.setRecord_Score(current_Score);
             }
             return 2;
         }
-
         //此时，分数未达目标且list.size()！=0，证明游戏还在进行中
-        return 1;
+        //但如果。前后滑动没有发生状态变化，我们也不能添加随机textview
+        boolean state=false;
+       for(int i=0;i<rowcount;i++){
+           for(int j=0;j<columncount;j++){
+               if(last_time_State[i][j]!=numberItemsList[i][j].getNum()){
+                   state=true;
+               }
+           }
+       }
+
+        if(state){
+            return 1;//正常状态
+        }
+        //非正常状况
+        return 4;
+    }
+
+    public int getCurrent_Score() {
+        return current_Score;
     }
 
 }

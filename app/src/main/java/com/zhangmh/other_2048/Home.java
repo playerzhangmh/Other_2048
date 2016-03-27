@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -29,19 +30,20 @@ public class Home extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
-        rl_home_gameview = (RelativeLayout) findViewById(R.id.rl_home_gameview);
-        //rl_home_gameview
+        application = (Myapplication) getApplication();
         mAcitivity=this;
         mGame_gridlayout = new Game_gridlayout(this);
+
+        rl_home_gameview = (RelativeLayout) findViewById(R.id.rl_home_gameview);
         rl_home_gameview.addView(mGame_gridlayout);
         //从sharepreference中获取配置参数，放到三个对应的控件中
         tv_home_tagScore = (TextView) findViewById(R.id.tv_home_tagScore);
         tv_home_currentScore = (TextView) findViewById(R.id.tv_home_currentScore);
         tv_home_recordScore = (TextView) findViewById(R.id.tv_home_recordScore);
-        application = (Myapplication) getApplication();
-        tv_home_tagScore.setText(""+application.getTag_Score());
+        tv_home_tagScore.setText("" + application.getTag_Score());
         tv_home_currentScore.setText(""+0);
         tv_home_recordScore.setText("" + application.getRecord_Score());
+
 
     }
 
@@ -78,7 +80,9 @@ public class Home extends ActionBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mGame_gridlayout.restart();
+        if(resultCode==1000){
+            mGame_gridlayout.restart();
+        }
 
     }
 }

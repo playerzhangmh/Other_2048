@@ -83,9 +83,11 @@ public class Options extends ActionBarActivity implements View.OnClickListener{
                 selectTagscore();
                 break;
             case R.id.bt_option_cancel:
+                setResult(10000);
                 finish();//直接挂掉，绝不允许后退到这个页面
                 break;
             case R.id.bt_option_confirm:
+                setResult(1000);
                 application.setLine_Num(Integer.parseInt(bt_option_linenum.getText().toString()));
                 application.setTag_Score(Integer.parseInt(bt_option_tagScore.getText().toString()));
                 finish();

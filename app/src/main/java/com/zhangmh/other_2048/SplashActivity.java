@@ -12,10 +12,15 @@ import net.youmi.android.spot.SpotManager;
 
 public class SplashActivity extends Activity {
 
+    private boolean jumpFlag=true;
+    private boolean pausejumpFlag;//用来判断从onpause到onresume状态的标示
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -27,8 +32,12 @@ public class SplashActivity extends Activity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        startActivity(new Intent(SplashActivity.this,Home.class));
-                        finish();
+                        if(jumpFlag) {
+                            Log.v("hw2","onCreatejumpFlag");
+                            Intent intent=new Intent(SplashActivity.this, Home.class);
+                            startActivity(intent);
+                            finish();
+                        }
                     }
                 });
             }
@@ -41,29 +50,37 @@ public class SplashActivity extends Activity {
         SpotManager.getInstance(this).showSpotAds(this, new SpotDialogListener() {
             @Override
             public void onShowSuccess() {
-                Log.v("hw2","onShowSuccess");
+                Log.v("hw2", "onShowSuccess");
             }
 
             @Override
             public void onShowFailed() {
-                Log.v("hw2","onShowFailed");
+                Log.v("hw2", "onShowFailed");
 
             }
 
             @Override
             public void onSpotClosed() {
-                Log.v("hw2","onSpotClosed");
+                Log.v("hw2", "onSpotClosed");
 
             }
 
             @Override
             public void onSpotClick(boolean b) {
-                Log.v("hw2","onSpotClick");
+                Log.v("hw2", "onSpotClick");
 
             }
         });
+
     }
-  /*  @Override
+    //按back键后，将当前activity干掉，不再跳入下个activity
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        jumpFlag=false;
+        Log.v("hw2","onBackPressed");
+    }
+    /*  @Override
     public void onBackPressed() {
         // 如果有需要，可以点击后退关闭插播广告。
         if (!SpotManager.getInstance(this).disMiss()) {
@@ -77,4 +94,63 @@ public class SplashActivity extends Activity {
         SpotManager.getInstance(this).onDestroy();
         super.onDestroy();
     }*/
+
+   /* @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+        jumpFlag=false;
+        Log.v("hw2", "onUserLeaveHint");
+    }*/
+
+
+    //当home键再次进来的时候
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        startActivity(new Intent(SplashActivity.this, Home.class));
+        this.finish();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //只有没有进入不可见状态才会从这里跳转
+        if(pausejumpFlag){
+            startActivity(new Intent(SplashActivity.this, Home.class));
+            this.finish();
+        }
+    }
+
+    @Override
+    //只有当跳到下一个activity或后退或home等的时候，才会调用这个方法
+    //而当oncreate中跳到下一个activity时，这里已经没有用了
+    //当back键时会直接finish掉
+    //而按Home键后，通过restart去直接跳转
+    //当只进入不可操作状态时候，获取焦点后直接在onresume中跳转
+    //而一旦onstop状态存在过，resume就不会执行跳转
+    protected void onPause() {
+        super.onPause();
+        Log.v("hw2", "onPause");
+        jumpFlag=false;
+        pausejumpFlag=true;//如果调用到onstop方法的话，将他置为false,不执行跳转，若没有执行到，则会跳转
+
+    }
+
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.v("hw2", "onStop");
+        pausejumpFlag=false;
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.v("hw2", "onDestroy");
+
+    }
 }
