@@ -116,7 +116,28 @@ public class Game_gridlayout extends GridLayout {
         if(size>0){
             int positon= (int) Math.floor(Math.random()*size);
             Point point=list.get(positon);
-            numberItemsList[point.x][point.y].setBackgroundAndNum(2);
+            double productnum=Math.random();
+            double v = productnum * 10000;
+            productnum = ((double) ((int) v)) / 10000;
+            Log.v("Game_gridlayout",productnum+"");
+            if(productnum<0.885||productnum>0.9){
+                numberItemsList[point.x][point.y].setBackgroundAndNum(2);
+            }else if(productnum>0.885&&productnum<0.899){
+                numberItemsList[point.x][point.y].setBackgroundAndNum(4);
+                Log.v("Game_gridlayout","4");
+            }else if(productnum==0.885){
+                numberItemsList[point.x][point.y].setBackgroundAndNum(8);
+                Log.v("Game_gridlayout","8");
+            }else if(productnum==0.899){
+                numberItemsList[point.x][point.y].setBackgroundAndNum(16);
+                Log.v("Game_gridlayout","16");
+            }else if(productnum==0.9){
+                numberItemsList[point.x][point.y].setBackgroundAndNum(128);
+                Log.v("Game_gridlayout","128");
+            }else {
+                numberItemsList[point.x][point.y].setBackgroundAndNum(64);
+                Log.v("Game_gridlayout","64");
+            }
         }
     }
     //每次都只添加num为0的项
@@ -369,86 +390,101 @@ public class Game_gridlayout extends GridLayout {
     public void handleResult(int resultcode){
         switch (resultcode){
             case 1://游戏可以继续进行，不用处理
-                    addNum();
+                addNum();
+                boolean state = handleLastAfterAddState();
+                if(!state){
+                   handlefail();
+                }
                 break;
             case 2://游戏失败，重新开始或退出游戏
-                mHome.getTv_home_recordScore().setText(application.getRecord_Score() + "");//死的时候可以看到，嘿嘿
-                new AlertDialog.Builder(getContext())
-                        .setTitle("fail")
-                        .setMessage("Game Over")
-                        .setPositiveButton("try again", new DialogInterface.OnClickListener() {
-
-
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                                removeAllViews();
-                                initView();
-                                mHome.getTv_home_currentScore().setText(0 + "");
-                                mHome.getTv_home_tagScore().setText(application.getTag_Score()+"");
-                            }
-                        })
-                        .setNegativeButton("drop it", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mHome.finish();
-                            }
-                        })
-                        .show();
+                handlefail();
                 break;
             case 3://游戏成功，重新开始或者挑战更高难度或者选择其他难度
-                mHome.getTv_home_recordScore().setText(application.getRecord_Score()+"");
-                new AlertDialog.Builder(getContext())
-                        .setTitle("success")
-                        .setMessage("congratulations!")
-                        .setPositiveButton("restart", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                removeAllViews();
-                                initView();
-                                mHome.getTv_home_currentScore().setText(0 + "");
-                                mHome.getTv_home_tagScore().setText(application.getTag_Score()+"");
-                            }
-                        })
-                        .setNegativeButton("challenge higher", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                                if (application.getTag_Score() == 4096 && application.getLine_Num() == 4) {
-                                    Toast.makeText(getContext(), "已经是最高难度", Toast.LENGTH_LONG).show();
-                                    removeAllViews();
-                                    initView();
-                                    mHome.getTv_home_currentScore().setText(0 + "");
-                                    mHome.getTv_home_tagScore().setText(application.getTag_Score()+"");
-                                } else if (application.getTag_Score() == 4096 && application.getLine_Num() > 4) {
-                                    application.setLine_Num(application.getLine_Num() - 1);
-                                    removeAllViews();
-                                    initView();
-                                    mHome.getTv_home_currentScore().setText(0 + "");
-                                    mHome.getTv_home_tagScore().setText(application.getTag_Score() + "");
-                                } else if (application.getTag_Score() < 4096 && application.getLine_Num() == 4) {
-                                    application.setTag_Score(application.getTag_Score() + 1024);
-                                    removeAllViews();
-                                    initView();
-                                    mHome.getTv_home_currentScore().setText(0 + "");
-                                    mHome.getTv_home_tagScore().setText(application.getTag_Score()+"");
-                                } else {
-                                    application.setLine_Num(application.getLine_Num() - 1);
-                                    application.setTag_Score(application.getTag_Score() + 1024);
-                                    removeAllViews();
-                                    initView();
-                                    mHome.getTv_home_currentScore().setText(0 + "");
-                                    mHome.getTv_home_tagScore().setText(application.getTag_Score() + "");
-
-                                }
-                            }
-                        })
-                        .show();
+                handlesuccess();
                 break;
             case 4:
                 break;
         }
     }
+
+    //游戏成功处理
+    private void handlesuccess() {
+        mHome.getTv_home_recordScore().setText(application.getRecord_Score()+"");
+        new AlertDialog.Builder(getContext())
+                .setTitle("success")
+                .setMessage("congratulations!")
+                .setPositiveButton("restart", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        removeAllViews();
+                        initView();
+                        mHome.getTv_home_currentScore().setText(0 + "");
+                        mHome.getTv_home_tagScore().setText(application.getTag_Score()+"");
+                    }
+                })
+                .setNegativeButton("challenge higher", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        if (application.getTag_Score() == 4096 && application.getLine_Num() == 4) {
+                            Toast.makeText(getContext(), "已经是最高难度", Toast.LENGTH_LONG).show();
+                            removeAllViews();
+                            initView();
+                            mHome.getTv_home_currentScore().setText(0 + "");
+                            mHome.getTv_home_tagScore().setText(application.getTag_Score()+"");
+                        } else if (application.getTag_Score() == 4096 && application.getLine_Num() > 4) {
+                            application.setLine_Num(application.getLine_Num() - 1);
+                            removeAllViews();
+                            initView();
+                            mHome.getTv_home_currentScore().setText(0 + "");
+                            mHome.getTv_home_tagScore().setText(application.getTag_Score() + "");
+                        } else if (application.getTag_Score() < 4096 && application.getLine_Num() == 4) {
+                            application.setTag_Score(application.getTag_Score() + 1024);
+                            removeAllViews();
+                            initView();
+                            mHome.getTv_home_currentScore().setText(0 + "");
+                            mHome.getTv_home_tagScore().setText(application.getTag_Score()+"");
+                        } else {
+                            application.setLine_Num(application.getLine_Num() - 1);
+                            application.setTag_Score(application.getTag_Score() + 1024);
+                            removeAllViews();
+                            initView();
+                            mHome.getTv_home_currentScore().setText(0 + "");
+                            mHome.getTv_home_tagScore().setText(application.getTag_Score() + "");
+
+                        }
+                    }
+                })
+                .show();
+    }
+
+    //游戏失败处理
+    private void handlefail() {
+        mHome.getTv_home_recordScore().setText(application.getRecord_Score() + "");//死的时候可以看到，嘿嘿
+        new AlertDialog.Builder(getContext())
+                .setTitle("fail")
+                .setMessage("Game Over")
+                .setPositiveButton("try again", new DialogInterface.OnClickListener() {
+
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        removeAllViews();
+                        initView();
+                        mHome.getTv_home_currentScore().setText(0 + "");
+                        mHome.getTv_home_tagScore().setText(application.getTag_Score()+"");
+                    }
+                })
+                .setNegativeButton("drop it", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mHome.finish();
+                    }
+                })
+                .show();
+    }
+
     //重置游戏
     public void restart(){
         mHome.getTv_home_recordScore().setText(application.getRecord_Score() + "");
@@ -512,6 +548,38 @@ public class Game_gridlayout extends GridLayout {
         //非正常状况
         return 4;
     }
+    //除了在移动前后判断状态，还要在移动完后，只剩下一个空白的时候，看随机产生的2能不能让游戏继续进行，若不能，这也提醒游戏失败
+    public boolean handleLastAfterAddState() {
+        updateList();
+        boolean stateflag=false;
+        if (list.size() == 0) {
+            for (int i = 0; i < rowcount; i++) {
+                for (int j = 0; j < columncount - 1; j++) {
+                    if (numberItemsList[i][j].getNum() == numberItemsList[i][j + 1].getNum()) {
+                        stateflag= true;
+                        break;
+                    }
+                }
+            }
+
+            for (int i = 0; i < columncount; i++) {
+                for (int j = 0; j < rowcount - 1; j++) {
+                    if (numberItemsList[j][i].getNum() == numberItemsList[j + 1][i].getNum()) {
+                        stateflag= true;
+                        break;
+                    }
+                }
+            }
+            //若不存在可以相加的模块，则游戏结束
+            if (current_Score >= application.getRecord_Score()) {
+                application.setRecord_Score(current_Score);
+            }
+        }else {
+            stateflag=true;
+        }
+        return stateflag;
+    }
+
 
     public int getCurrent_Score() {
         return current_Score;

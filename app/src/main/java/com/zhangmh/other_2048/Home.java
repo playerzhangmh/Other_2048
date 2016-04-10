@@ -1,6 +1,7 @@
 
 package com.zhangmh.other_2048;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,7 +16,7 @@ import android.widget.TextView;
 import com.zhangmh.view.Game_gridlayout;
 import com.zhangmh.view.Myapplication;
 
-public class Home extends ActionBarActivity {
+public class Home extends Activity {
 
     private RelativeLayout rl_home_gameview;
     private TextView tv_home_tagScore;

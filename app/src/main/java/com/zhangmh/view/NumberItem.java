@@ -34,7 +34,7 @@ public class NumberItem extends FrameLayout {
     public void initView(int numS){
         mGame_textview=new Game_textview(getContext(),numS);
         LayoutParams params=new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);//设定textview控件的尺寸
-        params.setMargins(5,5,5,5);
+        params.setMargins(1,1,1,1);
         setBackgroundAndNum(numS);//设定背景和text
         mGame_textview.setGravity(Gravity.CENTER);//内容居中
         addView(mGame_textview,params);
